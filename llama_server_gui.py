@@ -204,7 +204,9 @@ class LlamaCppServerGUI:
         self.stop_button = ttk.Button(button_frame, text="Stop Server", command=self.stop_server, state=tk.DISABLED)
         self.stop_button.pack(side=tk.LEFT, padx=5)
 
-        self.apply_button = ttk.Button(button_frame, text="Apply Settings", command=self.apply_settings)
+        self.apply_button = ttk.Button(
+            button_frame, text="Restart with Settings", command=self.apply_settings
+        )
         self.apply_button.pack(side=tk.LEFT, padx=5)
 
         ttk.Button(button_frame, text="Clear Output", command=self.clear_output).pack(side=tk.LEFT, padx=5)
@@ -358,7 +360,6 @@ class LlamaCppServerGUI:
 
     def _run_server_thread(self):
         """Thread function to run the llama.cpp server."""
-        binary_path = ""
         try:
             binary_path = self.server_binary.get()
             cmd = self.build_command()
@@ -380,7 +381,7 @@ class LlamaCppServerGUI:
                 for line in self.process.stdout:
                     if not self.is_running:
                         break
-                    self.root.after(0, lambda output_line=line: self.append_output(output_line))
+                    self.root.after(0, self.append_output, line)
 
             self.process.wait()
 
