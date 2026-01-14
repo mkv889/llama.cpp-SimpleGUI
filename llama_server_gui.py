@@ -10,6 +10,7 @@ import platform
 import subprocess
 import threading
 import tkinter as tk
+from functools import partial
 from tkinter import filedialog, messagebox, scrolledtext, ttk
 from urllib import error as url_error
 from urllib import request as url_request
@@ -363,8 +364,8 @@ class LlamaCppServerGUI:
         try:
             binary_path = self.server_binary.get()
             cmd = self.build_command()
-            self.root.after(0, lambda: self.status_var.set("Launching llama.cpp server..."))
-            self.root.after(0, lambda: self.append_output(f"Command: {' '.join(cmd)}\n\n"))
+            self.root.after(0, self.status_var.set, "Launching llama.cpp server...")
+            self.root.after(0, self.append_output, f"Command: {' '.join(cmd)}\n\n")
 
             self.process = subprocess.Popen(
                 cmd,
@@ -375,7 +376,7 @@ class LlamaCppServerGUI:
                 universal_newlines=True,
             )
 
-            self.root.after(0, lambda: self.server_status.set("Running"))
+            self.root.after(0, self.server_status.set, "Running")
 
             if self.process.stdout:
                 for line in self.process.stdout:
@@ -387,31 +388,23 @@ class LlamaCppServerGUI:
 
             returncode = self.process.returncode if self.process else -1
             if returncode == 0 and self.is_running:
-                self.root.after(
-                    0, lambda: self.status_var.set("Server exited normally.")
-                )
+                self.root.after(0, self.status_var.set, "Server exited normally.")
             elif returncode != 0:
-                self.root.after(
-                    0, lambda: self.status_var.set(f"Server exited with code {returncode}.")
-                )
+                self.root.after(0, self.status_var.set, f"Server exited with code {returncode}.")
 
         except FileNotFoundError:
-            self.root.after(
-                0, lambda bp=binary_path: messagebox.showerror("Error", f"Binary not found: {bp}")
-            )
-            self.root.after(0, lambda: self.status_var.set("Error: Binary not found"))
+            self.root.after(0, messagebox.showerror, "Error", f"Binary not found: {binary_path}")
+            self.root.after(0, self.status_var.set, "Error: Binary not found")
         except Exception as error:
             error_msg = str(error)
-            self.root.after(
-                0, lambda em=error_msg: messagebox.showerror("Error", f"Failed to start server: {em}")
-            )
-            self.root.after(0, lambda em=error_msg: self.status_var.set(f"Error: {em}"))
+            self.root.after(0, messagebox.showerror, "Error", f"Failed to start server: {error_msg}")
+            self.root.after(0, self.status_var.set, f"Error: {error_msg}")
         finally:
             self.is_running = False
             self.process = None
-            self.root.after(0, lambda: self.start_button.config(state=tk.NORMAL))
-            self.root.after(0, lambda: self.stop_button.config(state=tk.DISABLED))
-            self.root.after(0, lambda: self.server_status.set("Stopped"))
+            self.root.after(0, partial(self.start_button.config, state=tk.NORMAL))
+            self.root.after(0, partial(self.stop_button.config, state=tk.DISABLED))
+            self.root.after(0, self.server_status.set, "Stopped")
 
     def stop_server(self):
         """Stop the running server process."""
