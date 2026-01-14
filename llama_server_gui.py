@@ -376,7 +376,11 @@ class LlamaCppServerGUI:
 
     def _restart_server_after_stop(self, delay_ms=100):
         """Restart the server once the previous process has fully stopped."""
-        if self.is_running or self.process is not None:
+        process = self.process
+        if self.is_running:
+            self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
+            return
+        if process is not None and process.poll() is None:
             self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
             return
         self.start_server()
