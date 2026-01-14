@@ -15,6 +15,7 @@ A simple, user-friendly GUI interface for interacting with llama.cpp locally on 
 - **Real-time Output**: Live streaming of inference output
 - **Process Control**: Start, stop, and monitor inference execution
 - **Cross-platform**: Built with Tkinter for compatibility across Windows, macOS, and Linux
+- **Server GUI**: Configure and monitor an OpenAI-compatible llama.cpp server endpoint
 
 ## Requirements
 
@@ -42,6 +43,20 @@ python llama_gui.py
 chmod +x llama_gui.py
 ./llama_gui.py
 ```
+
+### Running the Server GUI
+
+```bash
+# Launch the OpenAI-compatible server GUI
+python llama_server_gui.py
+
+# Or make it executable and run directly
+chmod +x llama_server_gui.py
+./llama_server_gui.py
+```
+
+The server GUI lets you configure host/port, temperature, context size, and model path
+before starting the llama.cpp server process for other applications to connect to.
 
 ### Using the GUI
 
