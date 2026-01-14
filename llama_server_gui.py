@@ -57,11 +57,17 @@ class LlamaCppServerGUI:
 
         # Common winget installation paths on Windows
         if platform.system() == "Windows":
-            winget_paths = [
-                os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "WinGet", "Packages"),
-                os.path.join(os.environ.get("PROGRAMFILES", ""), "llama.cpp"),
-                os.path.join(os.environ.get("PROGRAMFILES(X86)", ""), "llama.cpp"),
-            ]
+            winget_paths = []
+            local_appdata = os.environ.get("LOCALAPPDATA")
+            program_files = os.environ.get("PROGRAMFILES")
+            program_files_x86 = os.environ.get("PROGRAMFILES(X86)")
+
+            if local_appdata:
+                winget_paths.append(os.path.join(local_appdata, "Microsoft", "WinGet", "Packages"))
+            if program_files:
+                winget_paths.append(os.path.join(program_files, "llama.cpp"))
+            if program_files_x86:
+                winget_paths.append(os.path.join(program_files_x86, "llama.cpp"))
 
             for base_path in winget_paths:
                 if os.path.exists(base_path):
@@ -235,12 +241,12 @@ class LlamaCppServerGUI:
         try:
             port = self.port.get()
         except tk.TclError:
-            port = ""
+            port = 8080
 
-        if port:
-            self.endpoint_url.set(f"http://{host}:{port}/v1")
-        else:
-            self.endpoint_url.set(f"http://{host}/v1")
+        if not isinstance(port, int) or port < 1 or port > 65535:
+            port = 8080
+
+        self.endpoint_url.set(f"http://{host}:{port}/v1")
 
     def browse_binary(self):
         """Browse for llama-server binary."""
