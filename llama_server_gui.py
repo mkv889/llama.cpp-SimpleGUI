@@ -71,14 +71,14 @@ class LlamaCppServerGUI:
 
             for base_path in winget_paths:
                 if os.path.exists(base_path):
-                    for root, dirs, files in os.walk(base_path):
-                        depth = os.path.relpath(root, base_path).count(os.sep)
+                    for walk_root, dirs, files in os.walk(base_path):
+                        depth = os.path.relpath(walk_root, base_path).count(os.sep)
                         if depth > 4:
                             dirs[:] = []
                             continue
                         for candidate in binary_names:
                             if candidate in files:
-                                binary_path = os.path.join(root, candidate)
+                                binary_path = os.path.join(walk_root, candidate)
                                 self.server_binary.set(binary_path)
                                 return
 
@@ -370,6 +370,15 @@ class LlamaCppServerGUI:
             ):
                 return
             self.stop_server()
+            self._restart_server_after_stop()
+            return
+        self.start_server()
+
+    def _restart_server_after_stop(self, delay_ms=100):
+        """Restart the server once the previous process has fully stopped."""
+        if self.is_running or self.process is not None:
+            self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
+            return
         self.start_server()
 
     def _run_server_thread(self):
@@ -386,7 +395,6 @@ class LlamaCppServerGUI:
                 stderr=subprocess.STDOUT,
                 text=True,
                 bufsize=1,
-                universal_newlines=True,
             )
 
             self.root.after(0, self.server_status.set, "Running")
