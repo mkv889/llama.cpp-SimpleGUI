@@ -276,10 +276,11 @@ class LlamaCppServerGUI:
         self.output_text.see(tk.END)
         self.output_text.config(state=tk.DISABLED)
 
-    def set_button_states(self, start_state, stop_state):
-        """Set the start/stop button states together."""
+    def set_button_states(self, start_state, stop_state, apply_state):
+        """Set the control button states together."""
         self.start_button.config(state=start_state)
         self.stop_button.config(state=stop_state)
+        self.apply_button.config(state=apply_state)
 
     def validate_inputs(self):
         """Validate user inputs before running server."""
@@ -344,9 +345,7 @@ class LlamaCppServerGUI:
             return
 
         self.is_running = True
-        self.start_button.config(state=tk.DISABLED)
-        self.stop_button.config(state=tk.NORMAL)
-        self.apply_button.config(state=tk.NORMAL)
+        self.set_button_states(tk.DISABLED, tk.NORMAL, tk.NORMAL)
         self.server_status.set("Starting...")
         self.clear_output()
 
@@ -406,7 +405,7 @@ class LlamaCppServerGUI:
         finally:
             self.is_running = False
             self.process = None
-            self.root.after(0, self.set_button_states, tk.NORMAL, tk.DISABLED)
+            self.root.after(0, self.set_button_states, tk.NORMAL, tk.DISABLED, tk.NORMAL)
             self.root.after(0, self.server_status.set, "Stopped")
 
     def stop_server(self):
@@ -421,8 +420,7 @@ class LlamaCppServerGUI:
 
             self.status_var.set("Server stopped by user.")
             self.append_output("\n\n=== Server stopped by user ===\n")
-            self.start_button.config(state=tk.NORMAL)
-            self.stop_button.config(state=tk.DISABLED)
+            self.set_button_states(tk.NORMAL, tk.DISABLED, tk.NORMAL)
             self.server_status.set("Stopped")
 
     def poll_server_status(self):
