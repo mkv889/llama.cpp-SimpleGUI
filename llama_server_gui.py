@@ -18,6 +18,8 @@ from urllib import request as url_request
 class LlamaCppServerGUI:
     """GUI application for running and monitoring llama.cpp server."""
 
+    RESTART_POLL_DELAY_MS = 100
+
     def __init__(self, root):
         self.root = root
         self.root.title("llama.cpp Server GUI")
@@ -374,13 +376,22 @@ class LlamaCppServerGUI:
             return
         self.start_server()
 
-    def _restart_server_after_stop(self, delay_ms=100):
+    def _restart_server_after_stop(self, delay_ms=None):
         """Restart the server once the previous process has fully stopped."""
+        if delay_ms is None:
+            delay_ms = self.RESTART_POLL_DELAY_MS
+
         process = self.process
         if self.is_running:
             self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
             return
-        if process is not None and process.poll() is None:
+        if process is None:
+            self.start_server()
+            return
+        if process is not self.process:
+            self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
+            return
+        if process.poll() is None:
             self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
             return
         self.start_server()
