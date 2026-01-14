@@ -1,10 +1,10 @@
 # llama.cpp SimpleGUI
 
 A lightweight, cross-platform Tkinter GUI for running llama.cpp locally. The repo
-ships with two front-ends:
+ships with two frontends:
 
-- **llama_gui.py**: run single prompts with `llama-cli` and stream output live.
-- **llama_server_gui.py**: configure and monitor the OpenAI-compatible
+- **llama_gui.py**: Run single prompts with `llama-cli` and stream output live.
+- **llama_server_gui.py**: Configure and monitor the OpenAI-compatible
   `llama-server` endpoint for use by other applications.
 
 ## Features
