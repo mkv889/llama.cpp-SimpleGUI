@@ -26,7 +26,7 @@ A simple, user-friendly GUI interface for interacting with llama.cpp locally on 
 
 1. Ensure llama.cpp is installed:
    - **Windows**: `winget install llama.cpp` (or download from releases)
-   - **Other platforms**: Build from source following the [build guide](docs/build.md)
+   - **Other platforms/Installation Methods**: See the official [llama.cpp repo.](https://github.com/ggml-org/llama.cpp)
 
 2. No additional Python packages are required - the GUI uses only standard library modules!
 
