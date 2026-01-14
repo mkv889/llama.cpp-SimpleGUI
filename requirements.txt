@@ -1,0 +1,20 @@
+# llama.cpp-SimpleGUI Requirements
+#
+# This application uses only Python standard library modules.
+# The only dependency is tkinter, which is typically included with Python
+# but may need to be installed separately on some systems.
+#
+# On Debian/Ubuntu Linux:
+#   sudo apt-get install python3-tk
+#
+# On Fedora:
+#   sudo dnf install python3-tkinter
+#
+# On macOS:
+#   tkinter is included with Python from python.org
+#   If using Homebrew Python: brew install python-tk
+#
+# On Windows:
+#   tkinter is included with the standard Python installer from python.org
+#
+# No additional pip packages are required.
