@@ -66,8 +66,8 @@ chmod +x llama_gui.py
 1. Launch the GUI
 2. Verify the binary path shows your llama-cli location
 3. Browse and select a model (e.g., `llama-2-7b-chat.Q4_K_M.gguf`)
-4. Enter a prompt like: "Explain quantum computing in simple terms."
-5. Adjust parameters (e.g., max tokens: 256, temperature: 0.7)
+4. Adjust parameters (e.g., max tokens: 256, temperature: 0.7)
+5. Enter a prompt like: "Explain quantum computing in simple terms."
 6. Click "Run Inference"
 7. Watch as the model generates text in real-time
 8. Copy the output or run another inference with different parameters
@@ -124,7 +124,3 @@ The GUI builds commands like:
 ```bash
 llama-cli -m <model> -p <prompt> -n <max_tokens> --temp <temperature> --top-p <top_p> --top-k <top_k>
 ```
-
-## License
-
-This GUI tool is part of the llama.cpp project and is licensed under the MIT License.
