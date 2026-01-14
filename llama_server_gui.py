@@ -71,14 +71,18 @@ class LlamaCppServerGUI:
 
             for base_path in winget_paths:
                 if os.path.exists(base_path):
-                    for root, _, files in os.walk(base_path):
+                    for root, dirs, files in os.walk(base_path):
+                        depth = os.path.relpath(root, base_path).count(os.sep)
+                        if depth > 4:
+                            dirs[:] = []
+                            continue
                         for candidate in binary_names:
                             if candidate in files:
                                 binary_path = os.path.join(root, candidate)
                                 self.server_binary.set(binary_path)
                                 return
 
-        for path_dir in os.environ.get("PATH", "").split(os.pathsep):
+        for path_dir in filter(None, os.environ.get("PATH", "").split(os.pathsep)):
             for candidate in binary_names:
                 binary_path = os.path.join(path_dir, candidate)
                 if os.path.isfile(binary_path) and os.access(binary_path, os.X_OK):
