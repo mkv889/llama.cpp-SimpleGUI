@@ -376,26 +376,20 @@ class LlamaCppServerGUI:
             return
         self.start_server()
 
-    def _restart_server_after_stop(self, delay_ms=None):
+    def _restart_server_after_stop(self):
         """Restart the server once the previous process has fully stopped."""
-        if delay_ms is None:
-            delay_ms = self.RESTART_POLL_DELAY_MS
-
         if self.is_running:
-            self._schedule_restart_check(delay_ms)
+            self._schedule_restart_check()
             return
         process = self.process
-        if process is None:
-            self.start_server()
-            return
-        if process.poll() is None:
-            self._schedule_restart_check(delay_ms)
+        if process is not None and process.poll() is None:
+            self._schedule_restart_check()
             return
         self.start_server()
 
-    def _schedule_restart_check(self, delay_ms):
+    def _schedule_restart_check(self):
         """Schedule the next restart readiness check."""
-        self.root.after(delay_ms, self._restart_server_after_stop, delay_ms)
+        self.root.after(self.RESTART_POLL_DELAY_MS, self._restart_server_after_stop)
 
     def _run_server_thread(self):
         """Thread function to run the llama.cpp server."""
