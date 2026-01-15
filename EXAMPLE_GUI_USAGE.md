@@ -14,6 +14,13 @@ cd /path/to/llama.cpp
 python llama_gui.py
 ```
 
+### 1b. Starting the Server GUI (OpenAI-Compatible Endpoint)
+
+```bash
+# Run the server GUI
+python llama_server_gui.py
+```
+
 ### 2. First-Time Setup
 
 When you first launch the GUI, you'll see:

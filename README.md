@@ -1,126 +1,143 @@
-# llama.cpp GUI Interface
+# llama.cpp SimpleGUI
 
-A simple, user-friendly GUI interface for interacting with llama.cpp locally on Windows (and other platforms).
+A lightweight, cross-platform Tkinter GUI for running llama.cpp locally. The repo
+ships with two frontends:
+
+- **llama_gui.py**: Run single prompts with `llama-cli` and stream output live.
+- **llama_server_gui.py**: Configure and monitor the OpenAI-compatible
+  `llama-server` endpoint for use by other applications.
 
 ## Features
 
-- **Automatic Binary Detection**: Automatically detects llama.cpp binaries installed via winget on Windows
-- **Model Selection**: Easy file browser for selecting GGUF model files
-- **Inference Parameters**: Configure common parameters like:
-  - Max tokens (1-4096)
-  - Temperature (0.0-2.0)
-  - Top-p (0.0-1.0)
-  - Top-k (1-100)
-- **Prompt Input**: Multi-line text area for entering prompts
-- **Real-time Output**: Live streaming of inference output
-- **Process Control**: Start, stop, and monitor inference execution
-- **Cross-platform**: Built with Tkinter for compatibility across Windows, macOS, and Linux
+### Inference GUI (llama_gui.py)
+
+- Automatic detection of `llama-cli` (winget, PATH, common build folders)
+- Model file browser for GGUF files
+- Common inference controls (max tokens, temperature, top-p, top-k)
+- Streaming output with start/stop controls
+
+### Server GUI (llama_server_gui.py)
+
+- Configure host/port for the OpenAI-compatible endpoint
+- Set model path, temperature, context size, and thread count
+- Start/stop server process with restart-on-change controls
+- Live monitoring of server health and loaded model via `/health` and `/v1/models`
 
 ## Requirements
 
-- Python 3.6 or higher
-- Tkinter (usually included with Python)
-- llama.cpp binaries installed (via winget on Windows or built from source)
+- Python 3.6+
+- Tkinter (bundled with most Python installs)
+- llama.cpp binaries:
+  - `llama-cli` for the inference GUI
+  - `llama-server` (or `server`) for the server GUI
 
 ## Installation
 
-1. Ensure llama.cpp is installed:
-   - **Windows**: `winget install llama.cpp` (or download from releases)
-   - **Other platforms/Installation Methods**: See the official [llama.cpp repo.](https://github.com/ggml-org/llama.cpp)
+1. Install llama.cpp:
+   - **Windows**: `winget install llama.cpp`
+   - **Other platforms**: Build from source or download binaries from
+     [ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)
+2. No additional Python dependencies are required.
 
-2. No additional Python packages are required - the GUI uses only standard library modules!
+## Quick Start
 
-## Usage
-
-### Running the GUI
+### Run the Inference GUI
 
 ```bash
-# Simply run the script
 python llama_gui.py
-
-# Or make it executable and run directly
+# or
 chmod +x llama_gui.py
 ./llama_gui.py
 ```
 
-### Using the GUI
+### Run the Server GUI
 
-1. **Binary Path**: The GUI will automatically detect your llama-cli binary. If not found, use the "Browse..." button to locate it manually.
+```bash
+python llama_server_gui.py
+# or
+chmod +x llama_server_gui.py
+./llama_server_gui.py
+```
 
-2. **Select Model**: Click "Browse..." next to "Model File" to select your GGUF model file.
+The server GUI displays an OpenAI-compatible base URL (for example
+`http://127.0.0.1:8080/v1`) that other applications can use.
 
-3. **Configure Parameters**: Adjust inference parameters as needed:
-   - **Max Tokens**: Maximum number of tokens to generate
-   - **Temperature**: Controls randomness (higher = more random)
-   - **Top-p**: Nucleus sampling parameter
-   - **Top-k**: Top-k sampling parameter
+## Using the Inference GUI
 
-4. **Enter Prompt**: Type your prompt in the text area.
+1. Confirm or browse to the `llama-cli` binary.
+2. Select a `.gguf` model file.
+3. Configure max tokens, temperature, top-p, and top-k.
+4. Enter your prompt and click **Run Inference**.
+5. Use **Stop** to terminate long-running output.
 
-5. **Run Inference**: Click "Run Inference" to start generation. Output will stream in real-time to the output area.
+## Using the Server GUI
 
-6. **Stop Inference**: Click "Stop" to terminate the running inference process if needed.
+1. Confirm or browse to the `llama-server`/`server` binary.
+2. Select the `.gguf` model you want to host.
+3. Configure host/port and server parameters (temperature, context size, threads).
+4. Click **Start Server** to launch the endpoint.
+5. Use **Restart with Settings** to apply updated values.
+6. Confirm status and loaded model in the monitoring panel.
 
-## Example Workflow
+Example health check:
 
-1. Launch the GUI
-2. Verify the binary path shows your llama-cli location
-3. Browse and select a model (e.g., `llama-2-7b-chat.Q4_K_M.gguf`)
-4. Adjust parameters (e.g., max tokens: 256, temperature: 0.7)
-5. Enter a prompt like: "Explain quantum computing in simple terms."
-6. Click "Run Inference"
-7. Watch as the model generates text in real-time
-8. Copy the output or run another inference with different parameters
+```bash
+curl http://127.0.0.1:8080/health
+```
+
+Example model listing (OpenAI-compatible):
+
+```bash
+curl http://127.0.0.1:8080/v1/models
+```
 
 ## Binary Detection
 
-The GUI automatically searches for llama-cli in the following locations (in order):
+Both GUIs search in the following order:
 
-1. **Windows winget paths**:
+1. **Windows winget paths** (when applicable):
    - `%LOCALAPPDATA%\Microsoft\WinGet\Packages\`
    - `%PROGRAMFILES%\llama.cpp\`
    - `%PROGRAMFILES(X86)%\llama.cpp\`
+2. **System PATH** (`llama-cli`, `llama-server` / `server`)
+3. **Local builds**: `build/bin`, `./build/bin`, `../build/bin`
 
-2. **System PATH**: Checks if `llama-cli` is in your PATH environment variable
+If a binary is not found, use the **Browse...** button to locate it manually.
 
-3. **Local build**: Looks for `build/bin/llama-cli` in common build directories
+## Command Examples
 
-If the binary is not found automatically, you can manually browse to its location.
+Inference GUI builds commands like:
+
+```bash
+llama-cli -m <model> -p <prompt> -n <max_tokens> --temp <temperature> --top-p <top_p> --top-k <top_k>
+```
+
+Server GUI builds commands like:
+
+```bash
+llama-server --model <model> --host <host> --port <port> --temp <temperature> --ctx-size <context> --threads <threads>
+```
 
 ## Troubleshooting
 
 ### Binary Not Found
 
-If the GUI shows "llama-cli not found":
-1. Verify llama.cpp is installed correctly
-2. Use the "Browse..." button to manually locate the binary
-3. On Windows, check winget installation: `winget list llama.cpp`
+- Confirm llama.cpp is installed or built locally.
+- Use **Browse...** to select the correct binary.
+- On Windows, verify the installation with `winget list llama.cpp`.
 
 ### Model File Issues
 
-If you get model loading errors:
-1. Ensure the file has a `.gguf` extension
-2. Verify the file is not corrupted
-3. Check you have read permissions for the file
+- Ensure the file has a `.gguf` extension and is readable.
+- Confirm the model matches your llama.cpp build.
 
-### Inference Errors
+### Server Endpoint Offline
 
-If inference fails:
-1. Check the output area for error messages
-2. Verify your model file is compatible with your llama.cpp version
-3. Try reducing max_tokens if you're running out of memory
-4. Ensure the binary has execute permissions (Linux/macOS)
+- Ensure the server is running and not blocked by a firewall.
+- Confirm the host/port configuration matches the client.
+- Check the output panel for startup errors.
 
-## Technical Details
+## More Examples
 
-- **GUI Framework**: Tkinter (Python standard library)
-- **Process Execution**: Uses `subprocess.Popen` for running llama-cli
-- **Threading**: Inference runs in a separate thread to keep GUI responsive
-- **Output Streaming**: Real-time line-by-line output streaming
-
-## Command Line Arguments
-
-The GUI builds commands like:
-```bash
-llama-cli -m <model> -p <prompt> -n <max_tokens> --temp <temperature> --top-p <top_p> --top-k <top_k>
-```
+See [EXAMPLE_GUI_USAGE.md](EXAMPLE_GUI_USAGE.md) for detailed walkthroughs and
+parameter tips.
